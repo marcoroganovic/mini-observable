@@ -145,7 +145,7 @@ class Observable {
       }
     }
 
-    this.subscription(safeObserver);
+    this.subscriber(safeObserver);
   }
 
 }
