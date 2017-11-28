@@ -1,5 +1,4 @@
 class Observable {
-
   static fromEvent(eventName, target) {
     return new Observable(observer => {
       const handler = (event) => { observer.next(event) };
@@ -7,6 +6,7 @@ class Observable {
       return () => target.removeEventListener(eventName, handler);
     });
   }
+
 
   static fromPromise(promise) {
     return new Observable(observer => {
@@ -16,6 +16,7 @@ class Observable {
     });
   }
 
+
   static of(...vals) {
     return new Observable(observer => {
       vals.forEach(value => observer.next(value));
@@ -23,6 +24,7 @@ class Observable {
       return this.noop;
     });
   }
+
 
   static idle(...vals) {
     return new Observable(observer => {
@@ -45,9 +47,11 @@ class Observable {
     });
   }
 
+
   constructor(subscriber) {
     this.subscriber = subscriber;
   }
+
 
   noop() {}
 
@@ -77,6 +81,49 @@ class Observable {
       }
 
       this.subscribe(customObserver);
+    });
+  }
+
+
+  delay(period) {
+    return new Observable(observer => {
+      const customObserver = {
+        ...observer,
+         next(data) {
+           setTimeout(() => {
+             observer.next(data);
+           }, period)
+         }
+      } 
+
+      this.subscribe(customObserver);
+    });
+  }
+
+
+  takeEvery(amount) {
+    let counter = 0;
+    return new Observable(observer => {
+      const customObserver = {
+        ...observer,
+        next(data) {
+          if(counter === amount) {
+            observer.next(data);
+            counter = 0;
+          } else {
+            counter++;
+          }
+        }
+      }
+
+      this.subscribe(customObserver);
+    });
+  }
+
+
+  throw() {
+    return new Observable(observer => {
+      observer.error();
     });
   }
 
