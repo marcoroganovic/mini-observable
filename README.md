@@ -11,13 +11,13 @@ import { fromEvent } from "./Observable";
 
 const $button = document.querySelector(".button");
 const move$ = fromEvent("mousemove", document)
-  .map(event => ({ x: event.clientX, y: event: clientY }))
+  .map(event => ({ x: event.clientX, y: event.clientY }))
   .map(rawCoords => ({ x: rawCoords.x + "px", y: rawCoords.y + "px" }))
-  .takeEvery(10);
+  .delay(50);
 
   move$.subscribe({
     next(coords) {
-      $button.style.transform = `translate(${coordsx})`
+      $button.style.transform = `translate(${coords.x}, ${coords.y})`
     }
   });
 ```
