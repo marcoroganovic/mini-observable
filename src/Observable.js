@@ -8,6 +8,43 @@ class Observable {
     });
   }
 
+  static fromPromise(promise) {
+    return new Observable(observer => {
+      promise.then((val => observer.next(val)));
+      observer.completed();
+      return this.noop;
+    });
+  }
+
+  static of(...vals) {
+    return new Observable(observer => {
+      vals.forEach(value => observer.next(value));
+      observer.completed();
+      return this.noop;
+    });
+  }
+
+  static idle(...vals) {
+    return new Observable(observer => {
+      vals.forEach(value => requestIdleCallback(() => observer.next(value)));
+      observer.completed();
+      return this.noop;
+    });
+  }
+
+
+  static interval(period) {
+    let counter = 0;
+    return new Observable(observer => {
+      const handler = () => observer.next(counter);
+      setInterval(handler, period);
+      return () => {
+        counter = 0;
+        clearInterval(handler);
+      }
+    });
+  }
+
   constructor(subscriber) {
     this.subscriber = subscriber;
   }
