@@ -63,7 +63,7 @@ class Observable {
         next(data) {
           observer.next(predicate(data));
         }
-      }
+      };
 
       this.subscribe(customObserver);
     })
