@@ -12,6 +12,7 @@ import { fromEvent } from "./Observable";
 const $button = document.querySelector(".button");
 const move$ = fromEvent("mousemove", document)
   .map(event => ({ x: event.clientX, y: event.clientY }))
+  // Could be one line, I know :)
   .map(rawCoords => ({ x: rawCoords.x + "px", y: rawCoords.y + "px" }))
   .delay(50);
 
