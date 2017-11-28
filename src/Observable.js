@@ -61,7 +61,7 @@ class Observable {
       const customObserver = {
         ...observer,
         next(data) {
-          observer.next(projection(data));
+          observer.next(predicate(data));
         }
       }
 
@@ -137,7 +137,7 @@ class Observable {
       safeObserver.error = this.noop;
     }
 
-    if(typeof observer === "object" && Array.isArray(observer)) {
+    if(typeof observer === "object" && !Array.isArray(observer)) {
       safeObserver = {
         ...observer,
         completed: observer.completed || this.noop,
