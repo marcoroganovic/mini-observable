@@ -51,6 +51,36 @@ class Observable {
 
   noop() {}
 
+
+  map(predicate) {
+    return new Observable(observer => {
+      const customObserver = {
+        ...observer,
+        next(data) {
+          observer.next(projection(data));
+        }
+      }
+
+      this.subscribe(customObserver);
+    })
+  }
+
+  filter(predicate) {
+    return new Observable(observer => {
+      const customObserver = {
+        ...observer,
+        next(data) {
+          if(predicate(data)) {
+            observer.next(data);
+          }
+        }
+      }
+
+      this.subscribe(customObserver);
+    });
+  }
+
+
   subscribe(observer) {
     let safeObserver = {};
 
