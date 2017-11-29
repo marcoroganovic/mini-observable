@@ -1,4 +1,16 @@
 class Observable {
+
+  static asBus() {
+    return new Observable(observer => {
+      this.push = (val) => {
+        observer.next(val);
+      };
+
+      return () => this.push = this.noop;
+    });
+  }
+
+
   static fromEvent(eventName, target) {
     return new Observable(observer => {
       const handler = (event) => { observer.next(event) };
@@ -10,8 +22,13 @@ class Observable {
 
   static fromPromise(promise) {
     return new Observable(observer => {
-      promise.then((val => observer.next(val)));
-      observer.completed();
+      promise.then((val => {
+        observer.next(val) 
+        observer.completed();
+      })).catch(err => {
+        observer.error(err);
+      })
+
       return this.noop;
     });
   }

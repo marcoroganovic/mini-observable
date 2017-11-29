@@ -110,6 +110,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Observable = function () {
   _createClass(Observable, null, [{
+    key: "asBus",
+    value: function asBus() {
+      var _this = this;
+
+      return new Observable(function (observer) {
+        _this.push = function (val) {
+          observer.next(val);
+        };
+
+        return function () {
+          return _this.push = _this.noop;
+        };
+      });
+    }
+  }, {
     key: "fromEvent",
     value: function fromEvent(eventName, target) {
       return new Observable(function (observer) {
@@ -125,20 +140,23 @@ var Observable = function () {
   }, {
     key: "fromPromise",
     value: function fromPromise(promise) {
-      var _this = this;
+      var _this2 = this;
 
       return new Observable(function (observer) {
         promise.then(function (val) {
-          return observer.next(val);
+          observer.next(val);
+          observer.completed();
+        }).catch(function (err) {
+          observer.error(err);
         });
-        observer.completed();
-        return _this.noop;
+
+        return _this2.noop;
       });
     }
   }, {
     key: "of",
     value: function of() {
-      var _this2 = this;
+      var _this3 = this;
 
       for (var _len = arguments.length, vals = Array(_len), _key = 0; _key < _len; _key++) {
         vals[_key] = arguments[_key];
@@ -149,13 +167,13 @@ var Observable = function () {
           return observer.next(value);
         });
         observer.completed();
-        return _this2.noop;
+        return _this3.noop;
       });
     }
   }, {
     key: "idle",
     value: function idle() {
-      var _this3 = this;
+      var _this4 = this;
 
       for (var _len2 = arguments.length, vals = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
         vals[_key2] = arguments[_key2];
@@ -168,7 +186,7 @@ var Observable = function () {
           });
         });
         observer.completed();
-        return _this3.noop;
+        return _this4.noop;
       });
     }
   }, {
@@ -200,7 +218,7 @@ var Observable = function () {
   }, {
     key: "map",
     value: function map(predicate) {
-      var _this4 = this;
+      var _this5 = this;
 
       return new Observable(function (observer) {
         var customObserver = _extends({}, observer, {
@@ -209,13 +227,13 @@ var Observable = function () {
           }
         });
 
-        _this4.subscribe(customObserver);
+        _this5.subscribe(customObserver);
       });
     }
   }, {
     key: "filter",
     value: function filter(predicate) {
-      var _this5 = this;
+      var _this6 = this;
 
       return new Observable(function (observer) {
         var customObserver = _extends({}, observer, {
@@ -226,13 +244,13 @@ var Observable = function () {
           }
         });
 
-        _this5.subscribe(customObserver);
+        _this6.subscribe(customObserver);
       });
     }
   }, {
     key: "delay",
     value: function delay(period) {
-      var _this6 = this;
+      var _this7 = this;
 
       return new Observable(function (observer) {
         var customObserver = _extends({}, observer, {
@@ -243,13 +261,13 @@ var Observable = function () {
           }
         });
 
-        _this6.subscribe(customObserver);
+        _this7.subscribe(customObserver);
       });
     }
   }, {
     key: "takeEvery",
     value: function takeEvery(amount) {
-      var _this7 = this;
+      var _this8 = this;
 
       var counter = 0;
       return new Observable(function (observer) {
@@ -264,7 +282,7 @@ var Observable = function () {
           }
         });
 
-        _this7.subscribe(customObserver);
+        _this8.subscribe(customObserver);
       });
     }
   }, {
