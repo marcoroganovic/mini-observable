@@ -2,7 +2,7 @@
 Small observable library built for learning purposes and toy projects when only basic
 functionality is required. API is pretty barebones, from observable constructors
 there is only `fromEvent`, `fromPromise`, `of`, `interval` and `idle`. As far as
-operators go, it supports `map`, `filter`, `delay`, `takeEvery` and `throw` for
+operators go, it supports `map`, `filter`, `delay`, `debounce`, `throttle`, `takeEvery` and `throw` for
 now.
 
 #### Example
