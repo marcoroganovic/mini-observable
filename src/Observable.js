@@ -1,14 +1,7 @@
+import { debounce as _debounce } from "./debounce";
+import { throttle as _throttle } from "./throttle";
+
 class Observable {
-
-  static asBus() {
-    return new Observable(observer => {
-      this.push = (val) => {
-        observer.next(val);
-      };
-
-      return () => this.push = this.noop;
-    });
-  }
 
 
   static fromEvent(eventName, target) {
