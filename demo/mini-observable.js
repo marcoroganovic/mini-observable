@@ -106,6 +106,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _debounce2 = __webpack_require__(2);
+
+var _throttle2 = __webpack_require__(3);
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Observable = function () {
@@ -123,15 +127,46 @@ var Observable = function () {
       });
     }
   }, {
+    key: "fromAjax",
+    value: function fromAjax(opts) {
+      var method = opts.method,
+          url = opts.url,
+          data = opts.data;
+
+
+      return new Observable(function (observer) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            observer.next(xhr.response);
+            observer.completed();
+          } else if (xhr.readyState === 4 && xhr.status !== 200) {
+            observer.error();
+          }
+        };
+
+        xhr.send(data);
+
+        return function () {
+          return xhr.abort();
+        };
+      });
+    }
+  }, {
     key: "fromPromise",
     value: function fromPromise(promise) {
       var _this = this;
 
       return new Observable(function (observer) {
         promise.then(function (val) {
-          return observer.next(val);
+          observer.next(val);
+          observer.completed();
+        }).catch(function (err) {
+          observer.error(err);
         });
-        observer.completed();
+
         return _this.noop;
       });
     }
@@ -247,9 +282,47 @@ var Observable = function () {
       });
     }
   }, {
+    key: "debounce",
+    value: function debounce(period) {
+      var _this7 = this;
+
+      return new Observable(function (observer) {
+        var debounced = (0, _debounce2.debounce)(function (val) {
+          observer.next(val);
+        }, period);
+
+        var customObserver = _extends({}, observer, {
+          next: function next(val) {
+            debounced(val);
+          }
+        });
+
+        _this7.subscribe(customObserver);
+      });
+    }
+  }, {
+    key: "throttle",
+    value: function throttle(period) {
+      var _this8 = this;
+
+      return new Observable(function (observer) {
+        var throttled = (0, _throttle2.throttle)(function (val) {
+          observer.next(val);
+        }, period);
+
+        var customObserver = _extends({}, observer, {
+          next: function next(val) {
+            throttled(val);
+          }
+        });
+
+        _this8.subscribe(customObserver);
+      });
+    }
+  }, {
     key: "takeEvery",
     value: function takeEvery(amount) {
-      var _this7 = this;
+      var _this9 = this;
 
       var counter = 0;
       return new Observable(function (observer) {
@@ -264,7 +337,7 @@ var Observable = function () {
           }
         });
 
-        _this7.subscribe(customObserver);
+        _this9.subscribe(customObserver);
       });
     }
   }, {
@@ -300,6 +373,65 @@ var Observable = function () {
 }();
 
 exports.default = Observable;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var debounce = exports.debounce = function debounce(fn, period) {
+  var timer = null;
+
+  return function () {
+    var context = this;
+    var args = Array.from(arguments);
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      fn.apply(context, args);
+    }, period);
+  };
+};
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var throttle = exports.throttle = function throttle(fn) {
+  var period = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+  var ctx = arguments[2];
+
+  var last = void 0,
+      defferTimer = void 0;
+
+  return function () {
+    var args = Array.from(arguments);
+    var context = ctx || this;
+    var now = +new Date();
+
+    if (last && now < period + last) {
+      clearTimeout(defferTimer);
+
+      defferTimer = setTimeout(function () {
+        last = now;
+        fn.apply(context, args);
+      }, period);
+    } else {
+      last = now;
+      fn.apply(context, args);
+    }
+  };
+};
 
 /***/ })
 /******/ ]);
