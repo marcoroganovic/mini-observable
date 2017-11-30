@@ -13,6 +13,26 @@ class Observable {
   }
 
 
+  static fromAjax(opts) {
+    const { method, url, data } = opts;
+
+    return new Observable(observer => {
+      const xhr = new XMLHttpRequest();
+      xhr.open(method, url);
+
+      xhr.onreadystatechange = () => {
+        if(xhr.readyState === 4 && xhr.status === 200) {
+          observer.next(xhr.response);
+          observer.completed();
+        } else if(xhr.readyState === 4 && xhr.status !== 200) {
+          observer.error();
+        }
+      }
+
+      xhr.send(data);
+    });
+  }
+
   static fromPromise(promise) {
     return new Observable(observer => {
       promise.then((val => {
