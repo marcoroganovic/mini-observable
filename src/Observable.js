@@ -3,7 +3,6 @@ import { throttle as _throttle } from "./throttle";
 
 class Observable {
 
-
   static fromEvent(eventName, target) {
     return new Observable(observer => {
       const handler = (event) => { observer.next(event) };
@@ -127,6 +126,42 @@ class Observable {
            }, period)
          }
       } 
+
+      this.subscribe(customObserver);
+    });
+  }
+
+
+  debounce(period) {
+    return new Observable(observer => {
+      const debounced = _debounce(function(val) {
+        observer.next(val);
+      }, period);
+
+      const customObserver = {
+        ...observer,
+        next(val) {
+          debounced(val);
+        }
+      }
+
+      this.subscribe(customObserver);
+    });
+  }
+
+
+  throttle(period) {
+    return new Observable(observer => {
+      const throttled = _throttle(function(val) {
+        observer.next(val);
+      }, period);
+
+      const customObserver = {
+        ...observer,
+        next(val) {
+          throttled(val);
+        }
+      }
 
       this.subscribe(customObserver);
     });
