@@ -30,6 +30,8 @@ class Observable {
       }
 
       xhr.send(data);
+
+      return () => xhr.abort();
     });
   }
 
