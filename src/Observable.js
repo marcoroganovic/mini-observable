@@ -215,6 +215,26 @@ class Observable {
     this.subscriber(safeObserver);
   }
 
+
+  skip(amount) {
+    return new Observable(observer => {
+      let count = 0;
+
+      const customObserver = {
+        ...observer,
+        next(val) {
+          if(count >= amount) {
+            observer.next(val);
+          } else {
+            count += 1;
+          }
+        }
+      };
+
+      this.subscribe(customObserver);
+    });
+  }
+
 }
 
 export default Observable;
