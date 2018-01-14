@@ -79,6 +79,20 @@ class Observable {
   }
 
 
+  static range(min, max) {
+    return new Observable(observer => {
+      while(min <= max) {
+        window.requestIdleCallback(() => {
+          observer.next();
+        });
+
+        max++;
+      }
+
+      return this.noop; 
+    });
+  }
+
   constructor(subscriber) {
     this.subscriber = subscriber;
   }
